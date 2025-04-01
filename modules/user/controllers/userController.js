@@ -24,12 +24,21 @@ const getUser = async (req, res) => {
 // Thêm User mới
 const addUser = async (req, res) => {
   try {
+    console.log("Received body:", req.body);
+
+    if (!req.body || Object.keys(req.body).length === 0) {
+      return res.status(400).json({ message: "Dữ liệu không hợp lệ hoặc rỗng" });
+    }
+
     const newUser = await userService.addUser(req.body);
     res.status(201).json(newUser);
   } catch (error) {
-    res.status(500).json({ message: "Lỗi khi thêm user", error });
+    console.error("Lỗi khi thêm user:", error);
+    res.status(500).json({ message: error.message });
   }
 };
+
+
 
 // Xóa User theo ID
 const deleteUserById = async (req, res) => {

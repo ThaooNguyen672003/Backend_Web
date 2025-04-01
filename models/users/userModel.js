@@ -8,11 +8,11 @@ const userSchema = new mongoose.Schema({
   email: { type: String, required: true, unique: true }, // Email duy nhất
   gender: { type: String, enum: ["Male", "Female"], require: true}, // Giới tính
   role: { 
-    type: String, 
-    enum: ["reader", "author"], 
-    default: "reader" 
+    type: String,
+    enum: ["reader", "author"],
+    default: "reader"
   }, // Vai trò: Độc giả, Tác giả
-  avatar: { type: String, default: "" }, // Ảnh đại diện (URL)
+  avatar: { type: String, default: "https://via.placeholder.com/150" },// Ảnh đại diện (URL)
 }, { timestamps: true, collection: "Users" });
 
 // Áp dụng middleware khi User bị xóa

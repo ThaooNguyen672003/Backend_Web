@@ -1,16 +1,20 @@
 const User = require("../../../models/users/userModel");
 const ReaderExpService = require("../../reader/services/readerExpService");
 const AuthorExpService = require("../../author/services/authorExpService");
+const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
 
 //Xử lý logic login (Kiểm tra thông tin, tạo token khi login success)
 const loginUser = async (email, password) => {
+
   const emailUser = await User.findOne({ email });
   if (!emailUser) throw new Error("Email không chính xác hoặc không tồn tại!");
 
-  const isMatch = await bcrypt.compare(password, user.password);
+  const isMatch = await bcrypt.compare(password, emailUser.password);
   if (!isMatch) throw new Error("Mật khẩu không đúng!");
 
-  const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: "7d" }); //Tạo token JWT
+  const token = jwt.sign({ id: emailUser._id }, process.env.JWT_SECRET, { expiresIn: "7d" });
+
   return token;
 };
 
@@ -22,18 +26,33 @@ const getUsers = async () => {
 // Thêm User mới
 const addUser = async (userData) => {
   try {
-    const existingUser = await User.findOne({ email: userData.email });
+    const { fullname, username, password, email, gender } = userData;
+
+    if (!fullname || !username || !password || !email || !gender) {
+      throw new Error("Vui lòng điền đầy đủ thông tin");
+    }
+
+    const existingUser = await User.findOne({ email });
     if (existingUser) {
       throw new Error("Email đã tồn tại");
     }
-    const newUser = new User(userData);
+
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
+
+    const newUser = new User({
+      fullname,
+      username,
+      password: hashedPassword,
+      email,
+      gender,
+    });
+
     await newUser.save();
-
-    await ReaderExpService.createReaderExp(newUser._id); //Tạo ReaderExp khi tạo User mới
-
-    return newUser;
+    return newUser;  // Trả về user, không dùng res.status()
   } catch (error) {
-    throw error;
+    console.error("Lỗi khi đăng ký:", error);
+    throw new Error("Lỗi server, không thể đăng ký");  // Ném lỗi lên controller
   }
 };
 
@@ -44,7 +63,7 @@ const deleteUserById = async (id) => {
     if (user) {
       await ReaderExpService.deleteReaderExp(id); // Xóa ReaderExp liên quan
       await AuthorExpService.deleteAuthorExp(id); // Xóa AuthorExp liên quan
-      console.log(`🗑️ User ${id} và dữ liệu liên quan đã bị xóa.`);
+      console.log(`User ${id} và dữ liệu liên quan đã bị xóa.`);
     }
     return user;
   } catch (error) {

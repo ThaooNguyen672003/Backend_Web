@@ -9,4 +9,9 @@ module.exports = {
 //   EMAIL_USER: process.env.EMAIL_USER,
 //   EMAIL_PASS: process.env.EMAIL_PASS,
 //   PAYMENT_MOMO_KEY: process.env.PAYMENT_MOMO_KEY,
+
+  // Cloudinary
+  CLOUDINARY_NAME: process.env.CLOUDINARY_NAME,
+  CLOUDINARY_API_KEY: process.env.CLOUDINARY_API_KEY,
+  CLOUDINARY_API_SECRET: process.env.CLOUDINARY_API_SECRET,
 };
