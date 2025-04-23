@@ -12,6 +12,7 @@ const userSchema = new mongoose.Schema({
     enum: ["reader", "author"],
     default: "reader"
   }, // Vai trò: Độc giả, Tác giả
+  idReaderExp: { type: mongoose.Schema.Types.ObjectId, ref: "ReaderExp" },
   avatar: { type: String, default: "https://via.placeholder.com/150" },// Ảnh đại diện (URL)
 }, { timestamps: true, collection: "Users" });
 

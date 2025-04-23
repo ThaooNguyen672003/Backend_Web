@@ -1,6 +1,8 @@
 const AuthorTask = require("../../../models/authors/authorTaskModel");
 const Task = require("../../../models/authors/taskModel");
 const AuthorExp = require("../../../models/authors/authorExpModel");
+const { addExpForAuthor } = require("./expUtils");
+
 
 //Tạo Author Task (Task hiện tại của Author)
 const createAuthorTask = async (authorExpID) => {
@@ -46,7 +48,6 @@ const completeAuthorTask = async (id) => {
   
       // 2️⃣ Đánh dấu là "completed"
       authorTask.status = "completed";
-      await authorTask.save();
   
       console.log(`✅ Nhiệm vụ ${authorTask.idTask} đã hoàn thành!`);
   
@@ -55,6 +56,7 @@ const completeAuthorTask = async (id) => {
       if (!authorExp) {
         throw new Error("❌ Không tìm thấy AuthorExp!");
       }
+      await addExpForAuthor(authorExp.idUser, authorTask.expEarned);
   
       authorExp.totalExp += authorTask.expEarned;
   

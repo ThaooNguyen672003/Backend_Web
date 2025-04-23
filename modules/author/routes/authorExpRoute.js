@@ -4,18 +4,12 @@ const authorExpController = require('../controllers/authorExpController');
 const { authMiddleware, authorize } = require("../../../middlewares/authMiddleware");
 
 //Lấy tất cả Exp Author
-route.get('/', authorize(["admin"]), authorExpController.getAllAuthorExp)
+route.get('/', /*authorize(["admin"]),*/ authorExpController.getAllAuthorExp)
 
-// //Thêm tự động Exp Author
-// route.post('/', authorExpController.addAuthorExp); //Hệ thống tự động thì xử lý trong service
+//lấy Exp Author theo IDUser
+route.get('/user/:idUser', /*authorize(["admin", "author"]),*/ authorExpController.getAuthorExpByIdUser);
 
 //Lấy Exp AuthorExp theo ID
-route.get('/:id', authorize(["admin", "author"]), authorExpController.getAuthorExpById);
-
-// //Xóa tự động AuthorExp theo ID
-// route.delete('/:id', authorExpController.deleteAuthorExpById);
-
-// //Cập nhật tự động AuthorExp theo ID
-// route.put('/:id', authorExpController.updateAuthorExpById);
+route.get('/:id', /*authorize(["admin", "author"]),*/ authorExpController.getAuthorExpById);
 
 module.exports = route;

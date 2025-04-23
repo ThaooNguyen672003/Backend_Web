@@ -16,6 +16,18 @@ const addComment = async (req, res) => {
     }
 };
 
+// Lấy tất cả comment của 1 Novel
+const getCommentsByNovel = async (req, res) => {
+    try {
+      const { idNovel } = req.params;
+      const comments = await commentService.getCommentsByNovel(idNovel);
+      res.status(200).json(comments);
+    } catch (error) {
+      console.error("Lỗi khi lấy comment theo novel:", error);
+      res.status(500).json({ message: "Không thể lấy danh sách bình luận" });
+    }
+  };
+
 //Lấy Comment theo ID
 const getCommentById = async (req, res) => {
     try {
@@ -39,7 +51,8 @@ const deleteCommentById = async (req, res) => {
 };
 
 module.exports = { 
-    addComment, 
+    addComment,
+    getCommentsByNovel,
     getCommentById, 
     deleteCommentById 
 };

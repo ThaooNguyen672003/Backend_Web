@@ -1,5 +1,17 @@
 const adminService = require("../services/adminService");
 
+// Xử lý login (Nhận email và password từ req đưa sang service xử lý logic)
+const loginAdmin = async (req, res) => {
+  try {
+    const { email, password } = req.body;
+    const { token, user } = await adminService.loginAdmin(email, password);
+
+    res.status(200).json({ token, user });
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+};
+
 // Lấy danh sách tất cả Admin
 const getAllAdmin = async (req, res) => {
   try {
@@ -42,9 +54,22 @@ const updateAdminById = async (req, res) => {
   }
 };
 
+// Delete Admin
+const deleteAdminById = async (req, res) => {
+  try {
+    const deletedAdmin = await adminService.deleteAdmin(req.params.id);
+    if (!deletedAdmin) return res.status(404).json({ message: "Admin không tồn tại" });
+    res.status(200).json({ message: "Xóa Admin thành công" });
+  } catch (error) {
+    res.status(500).json({ message: "Lỗi khi xóa Admin", error });
+  }
+};
+
 module.exports = {
+  loginAdmin,
   getAllAdmin,
   getAdminById,
   createAdmin,
   updateAdminById,
+  deleteAdminById,
 };

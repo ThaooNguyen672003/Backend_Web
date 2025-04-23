@@ -1,16 +1,44 @@
 const AuthorExp = require("../../../models/authors/authorExpModel");
-const AuthorTaskService = require("./authorTaskService");
+const { addExpForAuthor } = require("./expUtils");
+const AuthorLevel = require("../../../models/authors/authorLevelModel");
 
-// Tự động tạo khi có User có role là Author
 const createAuthorExp = async (userId) => {
-  const existingExp = await AuthorExp.findOne({ idUser: userId });
-  if (!existingExp) {
-    const authorExp = await AuthorExp.create({ idUser: userId });
+  try {
+    const existingExp = await AuthorExp.findOne({ idUser: userId });
+    if (!existingExp) {
+      const level1 = await AuthorLevel.findOne({ level: 1 });
+      if (!level1) {
+        console.error("❌ Không tìm thấy AuthorLevel cấp 1!");
+        return;
+      }
 
-    await AuthorTaskService.createAuthorTask(authorExp._id);
-    console.log("AuthorExp và AuthorTask đã được tạo!");
-  } else {
-    console.log("AuthorExp đã tồn tại, không tạo lại!");
+      const authorExp = await AuthorExp.create({
+        idUser: userId,
+        idLevel: level1._id,
+      });
+
+      // Tạo AuthorTask tương ứng
+      await AuthorTaskService.createAuthorTask(authorExp._id);
+
+      console.log("✅ AuthorExp và AuthorTask đã được tạo!");
+    } else {
+      console.log("ℹ️ AuthorExp đã tồn tại, không tạo lại!");
+    }
+  } catch (error) {
+    console.error("🔥 Lỗi trong createAuthorExp:", error.message);
+    throw error;
+  }
+};
+
+//Lấy AuthorExp theo IDUser
+const getByUserId = async (userId) => {
+  try {
+    const authorExp = await AuthorExp.findOne({ idUser: userId })
+      .populate("idUser", "username email")
+      .populate("idLevel", "level title");
+    return authorExp;
+  } catch (error) {
+    throw error;
   }
 };
 
@@ -34,32 +62,14 @@ const deleteAuthorExp = async (userId) => {
 const getAllAuthorExp = async () => {
   return await AuthorExp.find()
     .populate("idUser", "username email")
-    .populate("idAuthorTask");
+    .populate("idLevel", "level title"); // Thêm dòng này
 };
 
 // Lấy thông tin Exp của một Author theo ID
 const getAuthorExpById = async (id) => {
   return await AuthorExp.findById(id)
     .populate("idUser", "username email")
-    .populate("idAuthorTask");
-};
-
-// Cộng Exp tự động khi hoàn thành nhiệm vụ
-const addExpForAuthor = async (idUser, idAuthorTask, expEarned) => {
-  const authorExp = await AuthorExp.findOne({ idUser });
-
-  if (authorExp) {
-    authorExp.totalExp += expEarned;
-
-    // Cập nhật level nếu đủ điều kiện
-    if (authorExp.totalExp >= 100) {
-      authorExp.level += 1;
-    }
-
-    return await authorExp.save();
-  } else {
-    return await AuthorExp.create({ idUser, idAuthorTask, totalExp: expEarned, level: 1 });
-  }
+    .populate("idLevel", "level title"); // Thêm dòng này
 };
 
 // Xuất tất cả các hàm
@@ -67,6 +77,7 @@ module.exports = {
   createAuthorExp,
   deleteAuthorExp,
   getAllAuthorExp,
+  getByUserId,
   getAuthorExpById,
   addExpForAuthor,
 };

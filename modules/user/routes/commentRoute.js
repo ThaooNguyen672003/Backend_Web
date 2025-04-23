@@ -6,7 +6,10 @@ const {authMiddleware} = require('../../../middlewares/authMiddleware');
 //Thêm comment
 route.post('/', commentController.addComment);
 
-//Sửa comment qua Id
+// Lấy tất cả comment của 1 novel
+route.get('/novel/:idNovel', commentController.getCommentsByNovel);
+
+//Gọi comment qua Id
 route.get('/:id', commentController.getCommentById);
 
 //Xóa comment qua Id

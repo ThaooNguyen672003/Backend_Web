@@ -1,6 +1,7 @@
 const Novel = require("../../../models/novels/novelModel");
 const User = require("../../../models/users/userModel");
 const Category = require("../../../models/novels/categoryModel");
+const Chapter = require('../../../models/novels/chapterModel');
 
 //Thêm Novel mới
 const addNovel = async (novelData) => {
@@ -27,20 +28,24 @@ const addNovel = async (novelData) => {
     }
 };
 
-//Lấy tất cả Novel
+// Lấy tất cả Novel
 const getNovels = async () => {
     try {
-        const novels = await Novel.find().populate("idCategories", "titleCategory");
+        const novels = await Novel.find()
+            .populate("idCategories", "titleCategory")
+            .populate("idUser", "fullname username email role avatar");
         return novels;
     } catch (error) {
-        throw new Error(error.message);
+        throw new Error("Lỗi khi lấy danh sách Novel: " + error.message);
     }
 };
 
 //Lấy Novel theo ID
 const getNovelById = async (id) => {
     try {
-        const novel = await Novel.findById(id).populate("idCategories", "titleCategory").populate("idUser", "name");
+        const novel = await Novel.findById(id)
+            .populate("idCategories", "titleCategory")
+            .populate("idUser", "fullname username email role");
         if (!novel) {
             throw new Error("Không tìm thấy tiểu thuyết.");
         }
@@ -49,6 +54,32 @@ const getNovelById = async (id) => {
         throw new Error(error.message);
     }
 };
+
+// Lấy tất cả Novel của một người dùng
+const getNovelsByUserId = async (userId) => {
+    try {
+      const novels = await Novel.find({ idUser: userId })
+        .populate("idCategories", "titleCategory")
+        .populate("idUser", "fullname username email role avatar");
+      return novels;
+    } catch (error) {
+      throw new Error('Lỗi khi lấy danh sách tiểu thuyết theo người dùng: ' + error.message);
+    }
+  };
+
+
+const getNovelsByCategoryId = async (categoryId) => {
+    try {
+      const novels = await Novel.find({ idCategories: categoryId })
+        .populate("idCategories", "titleCategory")
+        .populate("idUser", "fullname username email role avatar");
+  
+      return novels;
+    } catch (error) {
+      throw new Error("Lỗi khi lấy danh sách tiểu thuyết theo danh mục: " + error.message);
+    }
+  };
+  
 
 //Cập nhật Novel theo ID
 const updateNovelById = async (id, updateData) => {
@@ -94,4 +125,4 @@ const deleteNovelById = async (id) => {
     }
 };
 
-module.exports = { getNovels, getNovelById, addNovel, updateNovelById, deleteNovelById };
+module.exports = { getNovels, getNovelById,getNovelsByUserId, getNovelsByCategoryId, addNovel, updateNovelById, deleteNovelById };

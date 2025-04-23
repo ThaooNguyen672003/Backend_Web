@@ -11,6 +11,14 @@ const addComment = async (commentData) => {
     }
 };
 
+//Lấy tất cả comment của Novel
+const getCommentsByNovel = async (idNovel) => {
+    return await Comment.find({ idNovel })
+      .sort({ createdAt: -1 }) // đảm bảo là object, không phải string
+      .populate("idUser", "fullname")
+      .populate("idNovel", "title");
+  };
+
 //Lấy Comment theo ID
 const getCommentById = async (id) => {
     try {
@@ -39,6 +47,7 @@ const deleteCommentById = async (id) => {
 
 module.exports = { 
     addComment,
+    getCommentsByNovel,
     getCommentById, 
     deleteCommentById 
 };

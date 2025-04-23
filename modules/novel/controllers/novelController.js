@@ -1,5 +1,6 @@
 const novelService = require("../services/novelService");
 
+
 //Thêm Novel mới test Postman
 const addNovel = async (req, res) => {
     try {
@@ -37,18 +38,49 @@ const getNovelById = async (req, res) => {
     }
 };
 
-//Cập nhật Novel theo ID
-const updateNovelById = async (req, res) => {
+//Lấy Novel theo idUser
+const getNovelsByUserId = async (req, res) => {
     try {
-        const { id } = req.params;
-        const updateData = req.body;
-
-        const updatedNovel = await novelService.updateNovelById(id, updateData);
-        res.status(200).json({ success: true, data: updatedNovel });
+        const { userId } = req.params;
+        const novels = await novelService.getNovelsByUserId(userId);
+        res.status(200).json({ success: true, data: novels });
     } catch (error) {
         res.status(400).json({ success: false, message: error.message });
     }
 };
+
+const getNovelByCategoryId = async (req, res) => {
+    try {
+      const { categoryId } = req.params;
+      const novels = await novelService.getNovelsByCategoryId(categoryId);
+      res.status(200).json({ success: true, data: novels });
+    } catch (error) {
+      res.status(400).json({ success: false, message: error.message });
+    }
+  };
+  
+  
+
+//Cập nhật Novel theo ID
+const updateNovelById = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const updateData = req.body;
+
+    // Nếu có file được upload
+    if (req.files && req.files.length > 0) {
+      const uploadedImage = req.files[0];
+      updateData.imageUrl = uploadedImage.path; // link từ Cloudinary
+    }
+
+    const updatedNovel = await novelService.updateNovelById(id, updateData);
+    res.status(200).json(updatedNovel);
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+};
+
+  
 
 //Xóa Novel theo ID
 const deleteNovelById = async (req, res) => {
@@ -61,4 +93,4 @@ const deleteNovelById = async (req, res) => {
     }
 };
 
-module.exports = { addNovel, getNovels, getNovelById, updateNovelById, deleteNovelById };
+module.exports = { addNovel, getNovels, getNovelById,getNovelsByUserId, getNovelByCategoryId, updateNovelById, deleteNovelById };

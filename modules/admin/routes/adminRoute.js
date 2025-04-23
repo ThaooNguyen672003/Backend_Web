@@ -3,6 +3,9 @@ const route = express.Router();
 const adminController = require("../controllers/adminController");
 const { authMiddleware, authorize } = require("../../../middlewares/authMiddleware");
 
+//Xử lý login admin
+route.post("/login", adminController.loginAdmin);
+
 // Lấy toàn bộ danh sách Admin
 route.get("/",  adminController.getAllAdmin);
 
@@ -14,5 +17,8 @@ route.get("/:id",  adminController.getAdminById);
 
 // Cập nhật thông tin Admin
 route.put("/:id",  adminController.updateAdminById);
+
+// Xóa thông tin Admin
+route.delete("/:id",  adminController.deleteAdminById);
 
 module.exports = route;

@@ -5,18 +5,13 @@ const chapterService = require("../services/chapterService");
  */
 const addChapter = async (req, res) => {
     try {
-        const { idNovel, title, content, order, role, price, imageUrl } = req.body;
-
-        if (!idNovel || !title || !content) {
-            return res.status(400).json({ success: false, message: "idNovel, title và content là bắt buộc." });
-        }
-
-        const newChapter = await chapterService.addChapter({ idNovel, title, content, order, role, price, imageUrl });
-        res.status(201).json({ success: true, data: newChapter });
+      const result = await chapterService.addChapter(req.body);
+      res.status(201).json({ success: true, message: "Chapter created successfully", data: result });
     } catch (error) {
-        res.status(400).json({ success: false, message: error.message });
+      res.status(400).json({ success: false, message: error.message });
     }
-};
+  };
+  
 
 /**
  * Lấy tất cả Chapters
@@ -24,6 +19,17 @@ const addChapter = async (req, res) => {
 const getChapters = async (req, res) => {
     try {
         const chapters = await chapterService.getChapters();
+        res.status(200).json({ success: true, data: chapters });
+    } catch (error) {
+        res.status(400).json({ success: false, message: error.message });
+    }
+};
+
+//Lấy Ds chapter theo Novel
+const getChaptersByNovelId = async (req, res) => {
+    try {
+        const { idNovel } = req.params;
+        const chapters = await chapterService.getChaptersByNovelId(idNovel);
         res.status(200).json({ success: true, data: chapters });
     } catch (error) {
         res.status(400).json({ success: false, message: error.message });
@@ -71,4 +77,4 @@ const deleteChapterById = async (req, res) => {
     }
 };
 
-module.exports = { addChapter, getChapters, getChapterById, updateChapterById, deleteChapterById };
+module.exports = { addChapter, getChapters, getChapterById, getChaptersByNovelId, updateChapterById, deleteChapterById };

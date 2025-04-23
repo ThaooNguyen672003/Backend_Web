@@ -1,15 +1,15 @@
 const ReaderRanking = require("../../../models/readers/readerRankingModel");
 const ReaderExp = require("../../../models/readers/readerExpModel");
-const User = require("../../../models/users/userModel");
 
 //Lấy danh sách 10 người có EXP cao nhất
-const getListRanking = async () => {
+const getListRankingReader = async () => {
   try {
     return await ReaderRanking.find()
       .sort({ totalExp: -1 }) // Sắp xếp theo tổng EXP giảm dần
+      .limit(10)              // Lấy 10 người đầu tiên
       .populate({
         path: "idUser",
-        select: "fullname", // Lấy fullname từ User
+        select: "fullname avatar" // Lấy fullname từ User
       })
       .populate({
         path: "idReaderExp",
@@ -20,8 +20,9 @@ const getListRanking = async () => {
   }
 };
 
+
 //Cập nhật bảng Ranking (tự động mỗi ngày)
-const updateRanking = async () => {
+const updateRankingReader = async () => {
   try {
     console.log("Bắt đầu cập nhật bảng xếp hạng...");
 
@@ -47,4 +48,4 @@ const updateRanking = async () => {
   }
 };
 
-module.exports = { getListRanking, updateRanking };
+module.exports = { getListRankingReader, updateRankingReader };
